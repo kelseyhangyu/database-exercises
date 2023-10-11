@@ -1,0 +1,1 @@
+This is an exercise for linking MySQL to Github.
