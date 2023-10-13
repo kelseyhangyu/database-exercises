@@ -69,7 +69,8 @@ WHERE name = 'Nevermind';
 -- Which albums were released in the 1990s?
 SELECT name, release_date
 FROM albums
-WHERE  release_date >= 1990 AND release_date < 2000; 
+WHERE  release_date >= 1990 AND release_date < 2000 -- release_date between 1990 and 1999
+order by release_date desc; 
 
 -- Which albums had less than 20 million certified sales? Rename this column as low_selling_albums.
 SELECT 
