@@ -1,1 +1,1 @@
-This is an exercise for linking MySQL to Github.
+This repository contains different exercises done by MySQL.
