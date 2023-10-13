@@ -5,8 +5,7 @@ show tables;
 
 -- SELECT DISTINCT title FROM titles;
 -- List the first 10 distinct last names sorted in descending order.
-select *
-from employees;
+
 SELECT DISTINCT last_name
 from employees
 order by last_name desc
@@ -17,7 +16,8 @@ limit 10;
 select *
 from employees
 where birth_date like '%12-25'
-and hire_date between '1990-01-01' and '1999-12-21'
+and hire_date like '199%'
+order by hire_date
 limit 5;
 
 -- Try to think of your results as batches, sets, or pages. The first five results are your first page. The five after that would be your second page, etc. Update the query to find the tenth page of results.
@@ -25,7 +25,7 @@ select *
 from employees
 where birth_date like '%12-25'
 and hire_date between '1990-01-01' and '1999-12-21'
-limit 5 offset 50;
+limit 5 offset 45;
 
 -- LIMIT and OFFSET can be used to create multiple pages of data. What is the relationship between OFFSET (number of results to skip), LIMIT (number of results per page), and the page number?
-#offset = limit * page number
+#offset = limit * page number - limit

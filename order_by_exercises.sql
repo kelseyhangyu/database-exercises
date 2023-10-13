@@ -59,26 +59,24 @@ order by last_name, first_name;
 -- Write a query to find all employees whose last name starts and ends with 'E'. Sort the results by their employee number. Enter a comment with the number of employees returned, the first employee number and their first and last name, and the last employee number with their first and last name.
 select*
 from employees
-where last_name like 'E%'
-and last_name like '%E'
+where last_name like 'E%E'
 order by emp_no;
 #899 employees returned, Ramzi Erde, Tadahiro Erde#
 
 -- Write a query to find all employees whose last name starts and ends with 'E'. Sort the results by their hire date, so that the newest employees are listed first. Enter a comment with the number of employees returned, the name of the newest employee, and the name of the oldest employee.
 select*
 from employees
-where last_name like 'E%'
-and last_name like '%E'
+where last_name like 'E%E'
 order by hire_date desc;
 #Teiji Eldridge, Sergi Erde#
 -- Find all employees hired in the 90s and born on Christmas. Sort the results so that the oldest employee who was hired last is the first result. Enter a comment with the number of employees returned, the name of the oldest employee who was hired last, and the name of the youngest employee who was hired first.
 
 select*
 from employees
-where last_name like 'E%'
-and last_name like '%E'
+where hire_date like '199%'
+and birth_date like '%12-25%'
 order by birth_date asc, hire_date desc;
-#899, Piyush Erbe, Menkae Etalle
+#362, Khun Bernini, Douadi Pettis#
 
 
 
@@ -87,3 +85,4 @@ order by birth_date asc, hire_date desc;
 
 
 
+ 
