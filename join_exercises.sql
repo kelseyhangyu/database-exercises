@@ -162,7 +162,7 @@ order by avg_salary desc
 limit 1;
 
 -- 8.Who is the highest paid employee in the Marketing department?
-select first_name, last_name, salary
+select first_name, last_name
 from salaries as s
 join employees as e
       on s.emp_no = e.emp_no
@@ -178,11 +178,11 @@ limit 1;
 select first_name, last_name, salary, dept_name
 from departments as d
 join dept_manager as dm
-on dm.dept_no = d.dept_no
+    on dm.dept_no = d.dept_no
 join salaries as s
-on s.emp_no = dm.emp_no
+    on s.emp_no = dm.emp_no
 join employees as e
-on s.emp_no = e.emp_no
+    on s.emp_no = e.emp_no
 where dm.to_date >= '2023-10-17'
 order by salary desc
 limit 1;
@@ -191,30 +191,44 @@ limit 1;
 select dept_name,round(avg(salary),0) as avg_salary
 from salaries as s
 join dept_emp as de
-on s.emp_no = de.emp_no
+    on s.emp_no = de.emp_no
 join departments as d
-on de.dept_no = d.dept_no
+	
+    on de.dept_no = d.dept_no
 group by dept_name
 order by avg_salary desc;
 
 -- 11.Bonus Find the names of all current employees, their department name, and their current manager's name.
-select concat(de.emp_no, e.first_name, e.last_name) as employee, concat(dm.emp_no, e.first_name, e.last_name) as manager, dept_name -- concat(e.first_name, ' ', e.last_name) as employee_name
+-- select concat(de.emp_no, e.first_name, e.last_name) as employee,  
+-- dept_name,
+-- select*
+-- concat(manager.first_name, ' ', manager.last_name) as manager -- concat(e.first_name, ' ', e.last_name) as employee_name
+-- from employees as e
+-- left join dept_manager as dm
+--     on e.emp_no = dm.emp_no
+-- join departments as d
+--     on dm.dept_no = d.dept_no
+-- join dept_emp as de
+-- 	on d.dept_no = de.dept_no;
+-- where de.to_date >= '2023-10-17'
+-- group by employee
+-- ;
+
+
+select*
 from employees as e
-left join dept_manager as dm
-on e.emp_no = dm.emp_no
+join dept_manager as dm
+    on e.emp_no = dm.emp_no
 join departments as d
-on dm.dept_no = d.dept_no
+    on dm.dept_no = d.dept_no
 join dept_emp as de
-on d.dept_no = de.dept_no
-where de.to_date >= '2023-10-17'
-group by employee
-;
-
-select * from employees;
-select * from dept_manager;
-select * from departments;
-
-
+	on d.dept_no = de.dept_no
+    
+    join employees as managers
+    on manager.emp_no = dm.emp_no;
+   --  where de.to_date >= '2023-10-17'
+--     order by dept_name
+--     
 
 
 
