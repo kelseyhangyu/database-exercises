@@ -121,11 +121,12 @@ join departments as d
 on d.dept_no = de.dept_no
 where d.dept_name = 'Customer Service' 
 and de.to_date >= '2023-10-17'
+and t.to_date > now()
 group by t.title
 order by t.title asc;
 
 -- 5. Find the current salary of all current managers.
-select d.dept_name, concat(e.first_name, ' ', e.last_name) as full_name, s.salary-- d.dept_name, e.first_name, e.last_name, dm.to_date
+select d.dept_name, concat(e.first_name, ' ', e.last_name) as manager, s.salary-- d.dept_name, e.first_name, e.last_name, dm.to_date
 from departments as d
 join dept_manager as dm 
 on d.dept_no = dm.dept_no
@@ -151,10 +152,11 @@ select * from salaries;
 select d.dept_name, avg(s.salary) as avg_salary -- dept_name, average_salary
 from salaries as s
 join dept_emp as de
-on s.emp_no = de.emp_no
+  on s.emp_no = de.emp_no
 join departments as d
-on d.dept_no = de.dept_no
+  on d.dept_no = de.dept_no
 where s.to_date >= '2023-10-17'
+and de.to_date > now()
 group by d.dept_name
 order by avg_salary desc
 limit 1;
@@ -163,11 +165,11 @@ limit 1;
 select first_name, last_name, salary
 from salaries as s
 join employees as e
-on s.emp_no = e.emp_no
+      on s.emp_no = e.emp_no
 join dept_emp as de
-on de.emp_no = e.emp_no
+      on de.emp_no = e.emp_no
 join departments as d
-on d.dept_no = de.dept_no
+      on d.dept_no = de.dept_no
 where dept_name = 'Marketing'
 order by salary desc
 limit 1;
