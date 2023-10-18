@@ -214,21 +214,44 @@ order by avg_salary desc;
 -- group by employee
 -- ;
 
+select 
+	CONCAT(e.first_name, ' ', e.last_name) AS 'Employee Name',
+    d.dept_name AS 'Department Name',
+    CONCAT(managers.first_name, ' ', managers.last_name) AS 'Manager_name'
+from employees e
+join dept_emp de
+	on e.emp_no=de.emp_no
+join departments d
+	on d.dept_no=de.dept_no
+join dept_manager dm
+	on dm.dept_no=de.dept_no and
+    dm.to_date > NOW()
+-- Join employees again as managers to get manager names.
+JOIN employees AS managers 
+	ON managers.emp_no = dm.emp_no
+WHERE de.to_date > CURDATE()
+ORDER BY d.dept_name;
 
-select*
-from employees as e
-join dept_manager as dm
-    on e.emp_no = dm.emp_no
-join departments as d
-    on dm.dept_no = d.dept_no
-join dept_emp as de
-	on d.dept_no = de.dept_no
-    
-    join employees as managers
-    on manager.emp_no = dm.emp_no;
-   --  where de.to_date >= '2023-10-17'
---     order by dept_name
---     
+
+-- SUBQUERY WAY
+
+SELECT
+	CONCAT(e.first_name, ' ', e.last_name) AS 'Employee Name',
+	d.dept_name AS 'Department Name',
+	m.managers AS 'Manager Name'
+FROM employees AS e
+JOIN dept_emp AS de ON de.emp_no = e.emp_no
+	AND de.to_date > CURDATE()
+JOIN departments AS d ON de.dept_no = d.dept_no 
+JOIN (SELECT
+		 dm.dept_no,
+		 CONCAT(e.first_name, ' ', e.last_name) AS managers
+	 FROM employees AS e
+	 JOIN dept_manager AS dm ON e.emp_no = dm.emp_no
+		 AND to_date > CURDATE()) AS m 
+	ON m.dept_no = d.dept_no
+ORDER BY d.dept_name;
+
 
 
 
