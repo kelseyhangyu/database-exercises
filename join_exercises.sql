@@ -14,7 +14,7 @@ i.e. one employee to many salaries
 i.e. An employee could have worked for many different departments, and a department can have many different employees.
 */
 
-############# Example ############
+################################### Example ###############################################
 SELECT columns
 FROM table_a as A #left table
 JOIN table_b as B #right table
@@ -87,18 +87,18 @@ left join users
 on users.id = roles.id
 group by roles.name;
 
-##################### Exercises ####################
+########################################### Exercises ###################################################
 /*1. Use the employees database.*/
 use employees;
 /* 2.Using the example in the Associative Table Joins section as a guide, 
 write a query that shows each department along with the name of the current manager for that department.*/
-select d.dept_name, e.first_name, e.last_name, dm.to_date
+select d.dept_name, concat(e.first_name, e.last_name) as manager
 from departments as d
 join dept_manager as dm
-on d.dept_no = dm.dept_no
+on d.dept_no = dm.dept_no # or, and dm.to_date > now()
 join employees as e
 on dm.emp_no = e.emp_no
-where dm.to_date >= '2023-10-17'
+where dm.to_date >= '2023-10-17' #or where dm.to_date > now()
 order by dept_name asc;
 
 -- 3. Find the name of all departments currently managed by women.
