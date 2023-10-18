@@ -87,14 +87,130 @@ left join users
 on users.id = roles.id
 group by roles.name;
 
+##################### Exercises ####################
+/*1. Use the employees database.*/
+use employees;
+/* 2.Using the example in the Associative Table Joins section as a guide, 
+write a query that shows each department along with the name of the current manager for that department.*/
+select d.dept_name, e.first_name, e.last_name, dm.to_date
+from departments as d
+join dept_manager as dm
+on d.dept_no = dm.dept_no
+join employees as e
+on dm.emp_no = e.emp_no
+where dm.to_date >= '2023-10-17'
+order by dept_name asc;
 
+-- 3. Find the name of all departments currently managed by women.
+select d.dept_name, concat(e.first_name, ' ', e.last_name)
+from departments as d
+join dept_manager as dm
+on d.dept_no = dm.dept_no
+join employees as e
+on dm.emp_no = e.emp_no
+where e.gender = 'F'
+and dm.to_date >= '2023-10-17'
+order by dept_name asc;
 
+-- 4. Find the current titles of employees currently working in the Customer Service department. 
+select t.title, count(*)
+from titles as t
+join dept_emp as de
+on t.emp_no = de.emp_no
+join departments as d
+on d.dept_no = de.dept_no
+where d.dept_name = 'Customer Service' 
+and de.to_date >= '2023-10-17'
+group by t.title
+order by t.title asc;
 
+-- 5. Find the current salary of all current managers.
+select d.dept_name, concat(e.first_name, ' ', e.last_name) as full_name, s.salary-- d.dept_name, e.first_name, e.last_name, dm.to_date
+from departments as d
+join dept_manager as dm 
+on d.dept_no = dm.dept_no
+join salaries as s
+on s.emp_no = dm.emp_no
+join employees as e
+on dm.emp_no = e.emp_no
+where dm.to_date >= '2023-10-17'
+and s.to_date >= '2023-10-17'
+order by d.dept_name asc;
 
+-- 6. Find the number of current employees in each department.
+select de.dept_no, d.dept_name, count(*)num_employees
+from dept_emp as de
+join departments as d
+on d.dept_no = de.dept_no
+where de.to_date >= '2023-10-17'
+group by d.dept_name
+order by d.dept_no;
 
+-- 7.Which department has the highest average salary? Hint: Use current not historic information.
+select * from salaries;
+select d.dept_name, avg(s.salary) as avg_salary -- dept_name, average_salary
+from salaries as s
+join dept_emp as de
+on s.emp_no = de.emp_no
+join departments as d
+on d.dept_no = de.dept_no
+where s.to_date >= '2023-10-17'
+group by d.dept_name
+order by avg_salary desc
+limit 1;
 
+-- 8.Who is the highest paid employee in the Marketing department?
+select first_name, last_name, salary
+from salaries as s
+join employees as e
+on s.emp_no = e.emp_no
+join dept_emp as de
+on de.emp_no = e.emp_no
+join departments as d
+on d.dept_no = de.dept_no
+where dept_name = 'Marketing'
+order by salary desc
+limit 1;
 
+-- 9.Which current department manager has the highest salary?
+select first_name, last_name, salary, dept_name
+from departments as d
+join dept_manager as dm
+on dm.dept_no = d.dept_no
+join salaries as s
+on s.emp_no = dm.emp_no
+join employees as e
+on s.emp_no = e.emp_no
+where dm.to_date >= '2023-10-17'
+order by salary desc
+limit 1;
 
+-- 10.Determine the average salary for each department. Use all salary information and round your results.
+select dept_name,round(avg(salary),0) as avg_salary
+from salaries as s
+join dept_emp as de
+on s.emp_no = de.emp_no
+join departments as d
+on de.dept_no = d.dept_no
+group by dept_name
+order by avg_salary desc;
+
+-- 11.Bonus Find the names of all current employees, their department name, and their current manager's name.
+select concat(de.emp_no, e.first_name, e.last_name) as employee, concat(dm.emp_no, e.first_name, e.last_name) as manager, dept_name -- concat(e.first_name, ' ', e.last_name) as employee_name
+from employees as e
+left join dept_manager as dm
+on e.emp_no = dm.emp_no
+join departments as d
+on dm.dept_no = d.dept_no
+join dept_emp as de
+on d.dept_no = de.dept_no
+where de.to_date >= '2023-10-17'
+group by employee
+;
+
+select * from employees;
+select * from dept_manager;
+select * from departments;
 
 
 
