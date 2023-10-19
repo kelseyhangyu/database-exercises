@@ -118,26 +118,39 @@ ORDER BY dept_name;
 -- and a new column 'is_current_employee' that is a 1 if the employee is still with the company and 0 if not. 
 -- DO NOT WORRY ABOUT DUPLICATE EMPLOYEES.
 
-select emp_no,dept_no, from_date as start_date, to_date as end_date,
+select emp_no, concat(first_name, ' ', last_name) as full_name, dept_no, from_date as start_date, to_date as end_date,
 case when to_date >= now() then true
      when to_date  < now() then false
 end as 'is_current_employee'
 from  dept_emp
+join employees using (emp_no)
 ;
 
 -- 2.Write a query that returns all employee names (previous and current), 
 -- and a new column 'alpha_group' that returns 'A-H', 'I-Q', or 'R-Z' 
 -- depending on the first letter of their last name.
+
 select first_name, last_name,
 case when substr(last_name,1,1) in ('A','b','c','d','e','f','g','H' )then 'A-H'
 	 when substr(last_name,1,1) in ('I','j','k','l','m','n','o','p','Q' )then 'I-Q'
-     when substr(last_name,1,1) in ('r','s','t','u','v','w','x','y','z' )then 'R-Z'
+     else 'R-Z'
 end as 'alpha_group'
 from employees
 order by first_name
 ;
-
+#---- another way -------#
+select 
+case when left(last_name,1) <= 'H' then 'A-H'
+     when substring(last_name,1,1) <= 'O' then 'I-Q'
+     else 'R-Z'
+end as alpha_group
+from employees
+;
+     
 -- 3.How many employees (current or previous) were born in each decade?
+select min(birth_date),max(birth_date)
+from employees;
+
 select count(*),
 case when birth_date like '195%' then '50s'
      when birth_date like '196%' then '60s'
@@ -157,55 +170,59 @@ end as dept_group
 from salaries
 join dept_emp using (emp_no)
 join departments using (dept_no)
+where salary.to_date > now()
 group by dept_group;
 
 -- BONUS: Remove duplicate employees from exercise 1.
-select  emp_no, first_name, last_name, hire_date
-from employees
-where emp_no in (select distinct emp_no
-from
-(select emp_no,dept_no, hire_date as start_date, to_date as end_date,
-case when to_date >= now() then true
-     when to_date  < now() then false
-end as 'is_current_employee'
-from employees
-join dept_emp
-using(emp_no))
-as sub)
+select emp_no, max(to_date)
+from dept_emp
+group by emp_no; # this inner query filters out the duplicates
+
+
+select 
+	e.emp_no
+	, concat(e.first_name, ' ', e.last_name) as full_name
+    , de.dept_no
+    , de.from_date
+    , de.to_date
+    , IF(de.to_date > now(), True, False) as 'is_current_employee'
+from employees as e
+	join dept_emp as de
+		using (emp_no)
+	join 
+		( -- max to_date for each employee
+        select emp_no, max(to_date) as to_date
+        from dept_emp
+        group by emp_no
+        ) as md
+        on e.emp_no = md.emp_no -- joining on emp_no AND to_date
+			and de.to_date = md.to_date
 ;
 
-#----------------------------------------------------#
-select emp_no,count(emp_no),
-case when count(emp_no) = 2 then 'duplicate'
- when count(emp_no) <> 2 then 'no_duplicate'
-end as is_duplicate
-from(
-select emp_no,dept_no, hire_date as start_date, to_date as end_date,
-case when to_date >= now() then true
-     when to_date  < now() then false
-end as 'is_current_employee'
-from employees
-join dept_emp
-using(emp_no)
-) as subquery
+#---------------- ANOTHER WAY ----------------#
 
-group by emp_no
-order by is_duplicate
-;
-#----------------------------------------------------#
-select emp_no, count(emp_no)
-from
-(select emp_no,dept_no, hire_date as start_date, to_date as end_date,
-case when to_date >= now() then true
-     when to_date  < now() then false
-end as 'is_current_employee'
+select
+	emp_no
+	, concat(first_name, ' ', last_name) as full_name
+    , dept_no
+    , from_date
+    , to_date
+    , IF(to_date > now(), True, False) as 'is_current_employee'
 from employees
-join dept_emp
-using(emp_no))
-as sub
-group by emp_no
-order by count(emp_no) desc
+	join dept_emp
+		using (emp_no)
+where (emp_no, to_date) IN 
+	(
+    select emp_no, max(to_date)
+	from dept_emp
+	group by emp_no
+    )
 ;
+
+
+
+
+
 
 
 
