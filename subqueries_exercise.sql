@@ -111,18 +111,21 @@ and to_date > now();
 -- 2. Find all the titles ever held by all current employees with the first name Aamod.
 select title, first_name, count(*)
 from employees
-join titles
+join titles #the join command here is not really needed
 USING (emp_no) 
 where first_name in (select first_name from employees where first_name = 'Aamod')
 and to_date > now()
 group by title;
 
 -- 3. How many people in the employees table are no longer working for the company? Give the answer in a comment in your code.
+
 select count(*) as 'number of inactive employees'
 from employees
-join dept_emp
-USING (emp_no) 
-where to_date < now();
+where emp_no not in
+(select emp_no
+from dept_emp
+where to_date > now()
+);
 
 -- 4. Find all the current department managers that are female. List their names in a comment in your code.
 select first_name, last_name, gender
@@ -131,6 +134,18 @@ join dept_manager
 USING (emp_no) 
 where gender = 'F'
 and to_date > now()
+;
+
+# or #
+
+select *
+from employees
+where gender = 'F'
+and emp_no in (
+select emp_no
+from dept_manager
+where to_date > now()
+)
 ;
 -- 5. Find all the employees who currently have a higher salary than the companie's overall, historical average salary.
 select e.emp_no, first_name, last_name, salary
@@ -143,6 +158,7 @@ from salaries)
 and to_date > now()
 order by salary asc
 ;
+#154543
 select avg (salary) from salaries;
 
 -- 6. How many current salaries are within 1 standard deviation of the current highest salary?
@@ -152,48 +168,26 @@ select avg (salary) from salaries;
  Add a comment above the query showing the numbe r of rows returned. 
  You will use this number (or the query that produced it) in other, larger queries*/
  
-select std(salary) from salaries as std;
-SELECT MAX(salary) from salaries as max;
+select std(salary)
+from salaries
+where to_date > now ; -- 1 std
 
-select count(*)
+select max(salary)
+from salaries
+where to_date > now(); -- max current
+
+select max(salary) - std(salary)
+from salaries
+where to_date > now(); -- the cutoff point
+
+select *
 from salaries
 where salary >=
-(SELECT max_salary - salary_stddev AS cuttoff_value
-FROM (
-    SELECT MAX(salary) AS max_salary
-    FROM salaries
-    WHERE to_date > NOW()
-) AS max_salary_subquery,
-(
-    SELECT STDDEV(salary) AS salary_stddev
-    FROM salaries
-    WHERE to_date > NOW()
-) AS stddev_subquery)
-;
- SELECT MAX(salary) AS max_salary
-    FROM salaries
-    WHERE to_date > NOW();
-    
-     SELECT STDDEV(salary) AS salary_stddev
-    FROM salaries
-    WHERE to_date > NOW();
-    
-
-select 220 / 2844047;
-# -------------------------------- Another way ------------------------------#
-select
-(select count(*)
+(select max(salary) - std(salary)
 from salaries
-where salary >=
-            (select (max(salary)-std(salary))
-            from salaries
-            where to_date > now()
-            ))
-/
-(select count(*)
-from salaries)
-*100 ;
-
+where to_date > now()
+)
+and to_date > now(); 
 
 # ------------------------ BONUS ------------------------#
 
