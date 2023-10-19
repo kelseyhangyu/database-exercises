@@ -147,15 +147,17 @@ group by decade;
 
 -- 4.What is the current average salary for each of the following department groups:
 --  R&D, Sales & Marketing, Prod & QM, Finance & HR, Customer Service?
-select avg(salary), dept_name
+select avg(salary),
+case when dept_name in ('Research', 'development') then 'R&D'
+     when dept_name in ('sales', 'marketing') then 'Sales & Marketing'
+     when dept_name in ('production', 'quality management') then 'Prod&QM'
+     when dept_name in ('finance', 'human resources') then 'Finance & HR'
+     else  'customer service'
+end as dept_group
 from salaries
-join dept_emp
-using (emp_no)
-join departments
-using (dept_no)
-where salaries.to_date > now()
-group by dept_name
-;
+join dept_emp using (emp_no)
+join departments using (dept_no)
+group by dept_group;
 
 -- BONUS: Remove duplicate employees from exercise 1.
 select  emp_no, first_name, last_name, hire_date
