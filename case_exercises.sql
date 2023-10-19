@@ -26,6 +26,7 @@ item_name like '%chicken%' as 'has chicken' ,
 item_name like '%steak%' as 'has steak'
 from orders;
 
+use chipotle;
 select sum(has_chicken)
 from
 (select distinct item_name, 
@@ -116,14 +117,12 @@ ORDER BY dept_name;
 -- 1.Write a query that returns all employees, their department number, their start date, their end date, 
 -- and a new column 'is_current_employee' that is a 1 if the employee is still with the company and 0 if not. 
 -- DO NOT WORRY ABOUT DUPLICATE EMPLOYEES.
-use employees;
-select emp_no,dept_no, hire_date as start_date, to_date as end_date,
+
+select emp_no,dept_no, from_date as start_date, to_date as end_date,
 case when to_date >= now() then true
      when to_date  < now() then false
 end as 'is_current_employee'
-from employees
-join dept_emp
-using(emp_no)
+from  dept_emp
 ;
 
 -- 2.Write a query that returns all employee names (previous and current), 
@@ -159,15 +158,54 @@ group by dept_name
 ;
 
 -- BONUS: Remove duplicate employees from exercise 1.
-use employees;
-select distinct emp_no,dept_no, hire_date as start_date, to_date as end_date,
+select  emp_no, first_name, last_name, hire_date
+from employees
+where emp_no in (select distinct emp_no
+from
+(select emp_no,dept_no, hire_date as start_date, to_date as end_date,
+case when to_date >= now() then true
+     when to_date  < now() then false
+end as 'is_current_employee'
+from employees
+join dept_emp
+using(emp_no))
+as sub)
+;
+
+
+#----------------------------------------------------#
+select emp_no,count(emp_no),
+case when count(emp_no) = 2 then 'duplicate'
+ when count(emp_no) <> 2 then 'no_duplicate'
+end as is_duplicate
+from(
+select emp_no,dept_no, hire_date as start_date, to_date as end_date,
 case when to_date >= now() then true
      when to_date  < now() then false
 end as 'is_current_employee'
 from employees
 join dept_emp
 using(emp_no)
+) as subquery
+
+group by emp_no
+order by is_duplicate
 ;
+#----------------------------------------------------#
+select emp_no, count(emp_no)
+from
+(select emp_no,dept_no, hire_date as start_date, to_date as end_date,
+case when to_date >= now() then true
+     when to_date  < now() then false
+end as 'is_current_employee'
+from employees
+join dept_emp
+using(emp_no))
+as sub
+group by emp_no
+order by count(emp_no) desc
+;
+
 
 
 
