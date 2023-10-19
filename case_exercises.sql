@@ -174,7 +174,6 @@ using(emp_no))
 as sub)
 ;
 
-
 #----------------------------------------------------#
 select emp_no,count(emp_no),
 case when count(emp_no) = 2 then 'duplicate'
@@ -207,6 +206,7 @@ as sub
 group by emp_no
 order by count(emp_no) desc
 ;
+
 
 
 
