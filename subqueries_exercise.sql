@@ -189,6 +189,28 @@ where to_date > now()
 )
 and to_date > now(); 
 
+# the percentage #
+select *
+from salaries
+where to_date > now(); -- total salaries
+
+select 
+(
+select *
+from salaries
+where salary >=
+(select max(salary) - std(salary)
+from salaries
+where to_date > now()
+)
+and to_date > now()
+)
+/
+(select *
+from salaries
+where to_date > now()
+);
+
 # ------------------------ BONUS ------------------------#
 
 -- Find all the department names that currently have female managers.
@@ -213,7 +235,6 @@ JOIN (SELECT
 ORDER BY dept_name;
 
 select * from dept_manager;
-
 
 -- Find the first and last name of the employee with the highest salary.
 select first_name, last_name, salary
