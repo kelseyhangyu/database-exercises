@@ -191,6 +191,75 @@ join dept_avg_salary using (dept_name);
  -- Do the z-scores for current department average salaries (from exercise 3) tell a similar 
  -- or a different story than the historic department salary z-scores?
 
+use employees;
+use ursula_2336;
+drop table current_dept;
+create temporary table current_dept as
+select dept_no,dept_name, avg(salary) as avg_cur_dept_salary
+from employees.salaries 
+join employees.dept_emp using (emp_no)
+join employees.departments using (dept_no)
+where salaries.to_date > now()
+group by dept_name;
+
+
+create temporary table his_dept as
+select avg(salary) as avg_his_dept_salary, dept_name, dept_no
+from employees.salaries 
+join employees.dept_emp using (emp_no)
+join employees.departments using (dept_no)
+where salaries.to_date < now()
+group by dept_name;
+
+
+
+ create temporary table his_zscore as
+ SELECT emp_no, salary
+        (salary - (SELECT AVG(salary) FROM employees.salaries where to_date > now()))
+        /
+        (SELECT stddev(salary) FROM employees.salaries where to_date > now()) AS his_zscore
+    FROM employees.salaries
+    WHERE to_date < now();
+    
+     create temporary table current_zscore as
+     SELECT emp_no, salary,
+        (salary - (SELECT AVG(salary) FROM employees.salaries where to_date > now()))
+        /
+        (SELECT stddev(salary) FROM employees.salaries where to_date > now()) AS cur_zscore
+    FROM employees.salaries
+    WHERE to_date > now();
+    
+
+create temporary table comparison as 
+select emp_no, cur_zscore , avg_cur_dept_salary, his_zscore,avg_his_dept_salary
+from current_dept 
+join his_dept using (dept_no)
+join employees.dept_emp using (dept_no)
+join his_zscore using (emp_no)
+join current_zscore using (emp_no)
+;
+ALTER TABLE comparison ADD overall_avg varchar (100);
+update comparison set overall_avg = 
+(select avg(salary) 
+from employees.salaries
+where to_date < now());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'
 
 
 
