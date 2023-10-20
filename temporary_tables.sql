@@ -244,6 +244,8 @@ update comparison set overall_avg =
 from employees.salaries
 where to_date < now());
 
+select * from comparison;
+
 
 
 
