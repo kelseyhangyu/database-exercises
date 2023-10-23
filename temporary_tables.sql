@@ -105,19 +105,14 @@ create temporary table employees_with_departments as
 SELECT first_name, last_name,dept_name
 FROM employees.employees
 JOIN employees.dept_emp USING(emp_no)
-JOIN employees.departments USING(dept_no);
+JOIN employees.departments USING(dept_no)
+where to_date > now();
 
 select * from  employees_with_departments;
 
 # 1a # Add a column named full_name to this table.It should be a VARCHAR whose length is the sum of the lengths of the first name and last name columns.
 
-create temporary table employees_with_departments as 
-SELECT first_name, last_name, dept_name
-FROM employees.employees
-JOIN employees.dept_emp USING(emp_no)
-JOIN employees.departments USING(dept_no);
-
-ALTER TABLE employees_with_departments ADD full_name VARCHAR(100);
+ALTER TABLE employees_with_departments ADD column full_name VARCHAR(100);
 
 # 1b # Update the table so that the full_name column contains the correct data.
 
@@ -148,8 +143,11 @@ use sakila;
 show tables;
 select * from payment;
 use ursula_2336;
+
 create temporary table payment as
-select round(amount,0) from sakila.payment;
+select payment_id, customer_id, staff_id, 
+cast(amount*100 as signed) as int_amount
+from sakila.payment;
 drop table payment;
 select * from payment;
 
@@ -178,12 +176,15 @@ create temporary table salary_zscore as
     WHERE to_date > now();
     select * from salary_zscore;
 
-select emp_no,salary,zscore,dept_name, avg_salary
+select emp_no, zscore,dept_name, avg_salary
 
 from salary_zscore
 join employees.dept_emp using (emp_no)
 join employees.departments using (dept_no)
-join dept_avg_salary using (dept_name);
+join dept_avg_salary using (dept_name)
+;
+#-------------- Another way ----------------#
+
 
 
 # BONUS #
@@ -201,6 +202,7 @@ join employees.dept_emp using (emp_no)
 join employees.departments using (dept_no)
 where salaries.to_date > now()
 group by dept_name;
+select * from current_dept;
 
 
 create temporary table his_dept as
@@ -210,16 +212,23 @@ join employees.dept_emp using (emp_no)
 join employees.departments using (dept_no)
 where salaries.to_date < now()
 group by dept_name;
+ select* from his_dept;
 
 
-
- create temporary table his_zscore as
- SELECT emp_no, salary
-        (salary - (SELECT AVG(salary) FROM employees.salaries where to_date > now()))
+ create temporary table his_zscore_ as
+ SELECT emp_no, salary, 
+ (salary - 
+ (SELECT AVG(salary) 
+        FROM employees.salaries where to_date > now())
+        )
         /
-        (SELECT stddev(salary) FROM employees.salaries where to_date > now()) AS his_zscore
+        (SELECT stddev(salary) FROM employees.salaries where to_date > now()) 
+        
+        AS his_zscore
+        
     FROM employees.salaries
     WHERE to_date < now();
+    select * from his_zscore_;
     
      create temporary table current_zscore as
      SELECT emp_no, salary,
@@ -228,14 +237,14 @@ group by dept_name;
         (SELECT stddev(salary) FROM employees.salaries where to_date > now()) AS cur_zscore
     FROM employees.salaries
     WHERE to_date > now();
+    select * from current_zscore;
     
-
 create temporary table comparison as 
 select emp_no, cur_zscore , avg_cur_dept_salary, his_zscore,avg_his_dept_salary
 from current_dept 
 join his_dept using (dept_no)
 join employees.dept_emp using (dept_no)
-join his_zscore using (emp_no)
+join his_zscore_ using (emp_no)
 join current_zscore using (emp_no)
 ;
 ALTER TABLE comparison ADD overall_avg varchar (100);
@@ -261,7 +270,7 @@ select * from comparison;
 
 
 
-'
+
 
 
 
